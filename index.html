@@ -3,28 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Bíblico - Aventura</title>
+    <title>Quiz Bíblico - Jornada</title>
+    <!-- Importando Fonte Profissional do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #1a252f;
-            --secondary-color: #d4af37; /* Dourado */
-            --bg-color: #f0f3f4;
-            --text-color: #2c3e50;
-            --success-color: #27ae60;
-            --error-color: #e74c3c;
-            --timer-color: #3498db;
-            --locked-color: #95a5a6;
+            /* Paleta de Cores Premium */
+            --primary-color: #0f2027;
+            --primary-light: #203a43;
+            --secondary-color: #f6c032;
+            --bg-color: #f4f7f6;
+            --surface-color: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --success-color: #10ac84;
+            --error-color: #ee5253;
+            --timer-color: #341f97;
+            --locked-color: #c8d6e5;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
             background-color: var(--bg-color);
+            background-image: radial-gradient(#e5e9ea 1px, transparent 1px);
+            background-size: 20px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -32,254 +41,363 @@
             padding: 20px;
         }
 
+        /* Animações Globais */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(-5px); }
+            100% { opacity: 0; transform: translateY(-15px); }
+        }
+
         .app-container {
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            background-color: var(--surface-color);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             overflow: hidden;
             position: relative;
         }
 
-        /* ----- CABEÇALHO GLOBAL (PONTUAÇÃO) ----- */
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* ----- CABEÇALHO GLOBAL ----- */
         .global-header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: white;
-            padding: 20px;
+            padding: 20px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 4px solid var(--secondary-color);
         }
 
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
         .score-display {
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 0.9rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
         }
 
         .score-display span {
             color: var(--secondary-color);
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
         }
 
         /* ----- TELA INICIAL (MAPA DE NÍVEIS) ----- */
         #start-screen {
-            padding: 30px;
+            padding: 35px 25px;
             text-align: center;
         }
 
         .title-header {
-            font-size: 2rem;
-            color: var(--text-color);
-            margin-bottom: 5px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            color: #7f8c8d;
-            margin-bottom: 25px;
-            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .levels-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 15px;
         }
 
         .level-card {
-            background-color: white;
-            border: 2px solid #ecf0f1;
-            border-radius: 12px;
-            padding: 20px 10px;
+            background-color: var(--surface-color);
+            border: 2px solid #edf2f7;
+            border-radius: 16px;
+            padding: 20px 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
         }
 
         .level-card.unlocked {
-            border-color: var(--secondary-color);
-            background-color: #fffbf0;
+            border-color: #fbeeb8;
+            background: linear-gradient(to bottom, #ffffff, #fffdf5);
+            box-shadow: 0 4px 15px rgba(246, 192, 50, 0.1);
         }
 
         .level-card.unlocked:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px rgba(246, 192, 50, 0.2);
+            border-color: var(--secondary-color);
         }
 
         .level-card.locked {
-            background-color: #f8f9f9;
-            border-color: #e5e8e8;
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
             cursor: not-allowed;
             color: var(--locked-color);
         }
 
         .level-icon {
-            font-size: 2rem;
+            font-size: 2.2rem;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
 
         .level-number {
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .level-card.locked .level-number {
+            color: var(--locked-color);
+        }
+
+        .level-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         /* ----- TELA DO QUIZ ----- */
-        #quiz-screen { display: none; }
-
         .quiz-info-bar {
             display: flex;
             justify-content: space-between;
             padding: 15px 25px;
-            background-color: #f8f9f9;
-            font-weight: bold;
-            color: var(--text-color);
-            border-bottom: 1px solid #ecf0f1;
+            background-color: #f8fafc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
         }
 
         .timer-container {
             width: 100%;
-            height: 10px;
-            background-color: #ecf0f1;
+            height: 6px;
+            background-color: #e2e8f0;
         }
 
         .timer-bar {
             height: 100%;
-            background-color: var(--timer-color);
+            background: linear-gradient(90deg, #4834d4, var(--timer-color));
             width: 100%;
-            transition: width 1s linear, background-color 0.3s;
+            transition: width 1s linear, background 0.3s;
+            border-radius: 0 5px 5px 0;
         }
 
-        .quiz-body { padding: 30px; }
+        .quiz-body { padding: 35px 25px; }
 
         h2#question {
-            font-size: 1.25rem;
-            color: var(--text-color);
+            font-size: 1.2rem;
+            color: var(--text-main);
             margin-bottom: 25px;
             text-align: center;
-            font-weight: 600;
-            line-height: 1.4;
+            font-weight: 700;
+            line-height: 1.5;
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .option-btn {
-            background-color: white;
-            border: 2px solid #ecf0f1;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 1rem;
-            color: var(--text-color);
+            background-color: var(--surface-color);
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 0.95rem;
+            color: var(--text-main);
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: left;
             font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .option-btn:hover:not(:disabled) {
-            border-color: var(--secondary-color);
-            background-color: #fcfdfe;
+            border-color: var(--timer-color);
+            background-color: #f8fafc;
+            transform: translateX(4px);
         }
 
-        .option-btn:disabled { cursor: not-allowed; }
+        .option-btn:disabled { cursor: default; }
 
         .option-btn.correct {
             background-color: var(--success-color);
             color: white;
             border-color: var(--success-color);
+            box-shadow: 0 8px 15px rgba(16, 172, 132, 0.2);
         }
 
         .option-btn.wrong {
             background-color: var(--error-color);
             color: white;
             border-color: var(--error-color);
+            box-shadow: 0 8px 15px rgba(238, 82, 83, 0.2);
         }
 
-        /* Animação de pontos ganhos */
         .points-earned {
             text-align: center;
-            color: var(--success-color);
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
             margin-top: 15px;
-            min-height: 25px;
+            height: 30px;
             opacity: 0;
-            transition: opacity 0.3s;
+        }
+
+        .points-earned.animate {
+            animation: floatUp 2s ease-out forwards;
         }
 
         .quiz-footer {
-            padding: 15px 30px;
+            padding: 15px 25px 25px;
             display: flex;
-            justify-content: flex-end;
-            background-color: #f8f9f9;
+            justify-content: center;
+            background-color: var(--surface-color);
         }
 
         .action-btn {
-            background-color: var(--secondary-color);
-            color: #fff;
+            background: linear-gradient(135deg, var(--secondary-color), #f39c12);
+            color: var(--primary-color);
             border: none;
-            padding: 12px 25px;
-            font-size: 1rem;
-            border-radius: 8px;
+            padding: 15px 35px;
+            font-size: 1.05rem;
+            border-radius: 30px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(246, 192, 50, 0.3);
+            width: 100%;
         }
         
-        .action-btn:hover { background-color: #b5952f; }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(246, 192, 50, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        .action-btn.secondary-btn {
+            background: #e2e8f0;
+            color: var(--text-main);
+            box-shadow: none;
+            margin-top: 15px;
+        }
+
+        .action-btn.secondary-btn:hover {
+            background: #cbd5e1;
+        }
+
         #next-btn { display: none; }
 
         /* ----- TELA DE RESULTADOS ----- */
         #result-screen {
-            display: none;
-            padding: 40px 30px;
+            padding: 45px 25px;
             text-align: center;
         }
 
         .score-circle {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            background-color: white;
-            color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 25px;
-            border: 6px solid var(--secondary-color);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin: 0 auto 30px;
+            border: 8px solid #f8fafc;
+            box-shadow: 0 15px 35px rgba(15, 32, 39, 0.2);
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
+            border-radius: 50%;
+            border: 2px dashed #cbd5e1;
+            z-index: -1;
         }
 
         .score-circle .big-score {
-            font-size: 2.2rem;
-            font-weight: bold;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
         }
 
         .score-circle .small-text {
-            font-size: 0.9rem;
-            color: #7f8c8d;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
         }
 
         .stats-box {
-            background: #f8f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 25px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
             font-size: 0.95rem;
-            color: var(--text-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-around;
+            border: 1px solid #e2e8f0;
         }
 
-        .stats-box div { margin: 5px 0; }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
 
     </style>
 </head>
@@ -287,27 +405,31 @@
 
     <div class="app-container">
         
+        <!-- CABEÇALHO GLOBAL -->
         <div class="global-header">
-            <div>🏆 Quiz Bíblico</div>
-            <div class="score-display">Pts: <span id="global-score">0</span></div>
+            <div class="header-title">📖 Quiz Bíblico</div>
+            <div class="score-display">Pontos: <span id="global-score">0</span></div>
         </div>
 
-        <div id="start-screen">
-            <h1 class="title-header">Jornada Bíblica</h1>
-            <p class="subtitle">Complete os níveis para avançar e acumule pontos!</p>
+        <!-- TELA INICIAL (MAPA DE NÍVEIS) -->
+        <div id="start-screen" class="screen active">
+            <h1 class="title-header">Sua Jornada</h1>
+            <p class="subtitle">Complete as fases para testar seus conhecimentos e acumular pontos.</p>
             
             <div class="levels-grid" id="levels-grid">
-                </div>
+                <!-- Níveis gerados pelo JS -->
+            </div>
             
-            <button class="action-btn" style="margin-top: 25px; background-color: var(--error-color);" onclick="resetProgress()">Zerar Progresso</button>
+            <button class="action-btn secondary-btn" style="color: var(--error-color);" onclick="resetProgress()">Zerar Progresso</button>
         </div>
 
-        <div id="quiz-screen">
+        <!-- TELA DO QUIZ -->
+        <div id="quiz-screen" class="screen">
             <div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
             
             <div class="quiz-info-bar">
                 <div id="level-display">Nível 1</div>
-                <div>Tempo: <span id="time-left">15</span>s</div>
+                <div>Tempo: <span id="time-left" style="color: var(--timer-color);">15</span>s</div>
                 <div><span id="current-question-text">1</span>/<span id="total-questions-text">5</span></div>
             </div>
 
@@ -322,72 +444,104 @@
             </div>
         </div>
 
-        <div id="result-screen">
+        <!-- TELA DE RESULTADOS DO NÍVEL -->
+        <div id="result-screen" class="screen">
             <h1 class="title-header" id="result-title">Nível Concluído!</h1>
+            <p class="subtitle" id="feedback-message" style="margin-bottom: 25px;">Calculando resultado...</p>
             
             <div class="score-circle">
                 <div class="big-score" id="level-score-display">+0</div>
-                <div class="small-text">Pontos ganhos</div>
+                <div class="small-text">Ganhos</div>
             </div>
 
             <div class="stats-box">
-                <div>Acertos: <strong id="correct-answers-display">0</strong></div>
-                <div>Bônus de Tempo: <strong id="time-bonus-display">0</strong> pts</div>
+                <div class="stat-item">
+                    <span class="stat-label">Acertos</span>
+                    <span class="stat-value" id="correct-answers-display">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Bônus (Tempo)</span>
+                    <span class="stat-value" id="time-bonus-display">0</span>
+                </div>
             </div>
             
-            <p class="subtitle" id="feedback-message">Calculando resultado...</p>
-            
-            <button class="action-btn" onclick="returnToMap()">Voltar ao Mapa 🌍</button>
+            <button class="action-btn" onclick="returnToMap()">Voltar ao Menu 🌍</button>
         </div>
 
     </div>
 
     <script>
-        // --- BANCO DE DADOS DAS FASES ---
+        // --- BANCO DE DADOS EXPANDIDO ---
+        // Adicionamos várias perguntas por nível para que o sorteio nunca seja igual.
         const levelsData = [
             {
                 id: 1,
                 title: "O Início",
+                icon: "🌍",
                 questions: [
                     { q: "Quem construiu a arca?", options: ["Moisés", "Noé", "Abraão", "Davi"], correct: 1 },
                     { q: "Qual o primeiro livro da Bíblia?", options: ["Êxodo", "Salmos", "Gênesis", "Mateus"], correct: 2 },
-                    { q: "Quantos dias durou a criação?", options: ["3", "6", "7", "40"], correct: 1 }
+                    { q: "Quantos dias durou a criação do mundo?", options: ["3", "6", "7", "40"], correct: 1 },
+                    { q: "Quem foi a primeira mulher?", options: ["Sara", "Eva", "Raquel", "Maria"], correct: 1 },
+                    { q: "O que Deus colocou no céu como sinal de que não destruiria mais a terra com água?", options: ["Estrela cadente", "Arco-íris", "Nuvem de fogo", "Pomba"], correct: 1 },
+                    { q: "Quem matou seu irmão Abel?", options: ["Esaú", "Jacó", "Caim", "Sete"], correct: 2 },
+                    { q: "Qual homem andou com Deus e Deus o tomou para si?", options: ["Matusalém", "Noé", "Enoque", "Lameque"], correct: 2 }
                 ]
             },
             {
                 id: 2,
                 title: "Patriarcas",
+                icon: "⛺",
                 questions: [
                     { q: "Quem foi o pai da nação de Israel?", options: ["Isaque", "Jacó", "Abraão", "José"], correct: 2 },
-                    { q: "Quem foi vendido como escravo pelos irmãos?", options: ["José", "Benjamin", "Ruben", "Davi"], correct: 0 },
-                    { q: "Qual o nome da esposa de Isaque?", options: ["Sara", "Raquel", "Rebeca", "Lia"], correct: 2 }
+                    { q: "Quem foi vendido como escravo pelos próprios irmãos?", options: ["José", "Benjamin", "Ruben", "Davi"], correct: 0 },
+                    { q: "Qual o nome da esposa de Isaque?", options: ["Sara", "Raquel", "Rebeca", "Lia"], correct: 2 },
+                    { q: "Quem teve seu nome mudado para Israel?", options: ["Abraão", "Isaque", "Jacó", "Moisés"], correct: 2 },
+                    { q: "Quem interpretou os sonhos do Faraó no Egito?", options: ["Daniel", "Moisés", "Jacó", "José"], correct: 3 },
+                    { q: "Quantos filhos homens Jacó teve?", options: ["7", "10", "12", "14"], correct: 2 },
+                    { q: "Qual era o filho mais novo de Jacó?", options: ["José", "Judá", "Benjamim", "Rúben"], correct: 2 }
                 ]
             },
             {
                 id: 3,
                 title: "O Êxodo",
+                icon: "🌊",
                 questions: [
                     { q: "Quem abriu o Mar Vermelho pelo poder de Deus?", options: ["Arão", "Moisés", "Josué", "Calebe"], correct: 1 },
-                    { q: "O que Deus enviou do céu para alimentar o povo?", options: ["Pão", "Maná", "Trigo", "Peixe"], correct: 1 },
-                    { q: "Quantas pragas atingiram o Egito?", options: ["7", "10", "12", "40"], correct: 1 }
+                    { q: "O que Deus enviou do céu para alimentar o povo no deserto?", options: ["Pão", "Maná", "Trigo", "Peixe"], correct: 1 },
+                    { q: "Quantas pragas atingiram o Egito?", options: ["7", "10", "12", "40"], correct: 1 },
+                    { q: "Onde Moisés recebeu os Dez Mandamentos?", options: ["Monte Carmelo", "Monte Sinai", "Monte Sião", "Monte das Oliveiras"], correct: 1 },
+                    { q: "O que o povo fez enquanto Moisés estava no monte?", options: ["Oraram", "Dormiram", "Fizeram um bezerro de ouro", "Construíram o tabernáculo"], correct: 2 },
+                    { q: "Quem foi o porta-voz de Moisés diante do Faraó?", options: ["Josué", "Miriã", "Arão", "Jetro"], correct: 2 },
+                    { q: "Qual o nome da irmã de Moisés?", options: ["Miriã", "Débora", "Ester", "Rute"], correct: 0 }
                 ]
             },
             {
                 id: 4,
-                title: "Reis de Israel",
+                title: "Reis",
+                icon: "👑",
                 questions: [
                     { q: "Quem foi o primeiro rei de Israel?", options: ["Davi", "Salomão", "Saul", "Samuel"], correct: 2 },
                     { q: "Qual rei pediu sabedoria a Deus?", options: ["Davi", "Ezequias", "Josias", "Salomão"], correct: 3 },
-                    { q: "Quem derrotou Golias?", options: ["Saul", "Davi", "Jônatas", "Sansão"], correct: 1 }
+                    { q: "Quem derrotou o gigante Golias?", options: ["Saul", "Davi", "Jônatas", "Sansão"], correct: 1 },
+                    { q: "Qual rei construiu o grande Templo em Jerusalém?", options: ["Davi", "Salomão", "Herodes", "Saul"], correct: 1 },
+                    { q: "Qual rei tinha o profeta Natã como conselheiro?", options: ["Saul", "Acabe", "Davi", "Salomão"], correct: 2 },
+                    { q: "Qual rainha visitou o rei Salomão para testar sua sabedoria?", options: ["Rainha de Sabá", "Rainha Ester", "Rainha de Ninive", "Jezabel"], correct: 0 },
+                    { q: "Quem foi o rei que tocou harpa para acalmar Saul?", options: ["Asafe", "Davi", "Salomão", "Samuel"], correct: 1 }
                 ]
             },
             {
                 id: 5,
-                title: "Novo Testamento",
+                title: "Evangelhos",
+                icon: "🕊️",
                 questions: [
                     { q: "Em qual cidade Jesus nasceu?", options: ["Nazaré", "Jerusalém", "Belém", "Cafarnaum"], correct: 2 },
                     { q: "Quem batizou Jesus?", options: ["Pedro", "João Batista", "Paulo", "Tiago"], correct: 1 },
-                    { q: "Quantos apóstolos Jesus escolheu?", options: ["10", "12", "7", "3"], correct: 1 }
+                    { q: "Quantos apóstolos Jesus escolheu?", options: ["10", "12", "7", "3"], correct: 1 },
+                    { q: "Qual foi o primeiro milagre de Jesus?", options: ["Andar sobre as águas", "Curar o cego", "Transformar água em vinho", "Multiplicar pães"], correct: 2 },
+                    { q: "Qual apóstolo traiu Jesus por 30 moedas de prata?", options: ["Pedro", "Tomé", "João", "Judas Iscariotes"], correct: 3 },
+                    { q: "Onde Jesus foi crucificado?", options: ["Getsêmani", "Gólgota", "Monte Sinai", "Jericó"], correct: 1 },
+                    { q: "Qual discípulo negou Jesus três vezes?", options: ["João", "Tiago", "Pedro", "André"], correct: 2 }
                 ]
             }
         ];
@@ -396,20 +550,19 @@
         let totalScore = parseInt(localStorage.getItem('bibleQuizScore')) || 0;
         let unlockedLevels = parseInt(localStorage.getItem('bibleQuizUnlocked')) || 1;
         
-        let currentLevelObj = null;
+        let currentSessionQuestions = []; // Perguntas sorteadas para a partida atual
         let currentQuestionIndex = 0;
+        let currentLevelId = 1;
         
-        // Controle de pontuação da partida
         let sessionScore = 0;
         let sessionCorrectAnswers = 0;
         let sessionTimeBonus = 0;
         
-        // Timer
-        const maxTime = 15; // 15 segundos por pergunta
+        const maxTime = 15;
+        const questionsPerMatch = 5; // Quantidade de perguntas por fase
         let timeLeft = maxTime;
         let timerInterval;
 
-        // Elementos DOM
         const dom = {
             globalScore: document.getElementById('global-score'),
             levelsGrid: document.getElementById('levels-grid'),
@@ -433,19 +586,34 @@
             }
         };
 
-        // --- INICIALIZAÇÃO ---
+        // --- FUNÇÕES UTILITÁRIAS (RANDOMIZER) ---
+        // Algoritmo de Fisher-Yates para embaralhar Arrays perfeitamente
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // --- CONTROLE DE TELAS ---
+        function switchScreen(screenId) {
+            Object.values(dom.screens).forEach(screen => {
+                screen.classList.remove('active');
+            });
+            dom.screens[screenId].classList.add('active');
+        }
+
         function initApp() {
             updateGlobalScore();
             renderLevelMap();
         }
 
         function updateGlobalScore() {
-            dom.globalScore.innerText = totalScore;
+            dom.globalScore.innerText = totalScore.toLocaleString('pt-BR');
             localStorage.setItem('bibleQuizScore', totalScore);
             localStorage.setItem('bibleQuizUnlocked', unlockedLevels);
         }
 
-        // --- RENDERIZAR MAPA ---
         function renderLevelMap() {
             dom.levelsGrid.innerHTML = '';
             
@@ -455,9 +623,9 @@
                 card.className = `level-card ${isUnlocked ? 'unlocked' : 'locked'}`;
                 
                 card.innerHTML = `
-                    <div class="level-icon">${isUnlocked ? '📖' : '🔒'}</div>
-                    <div class="level-number">Nível ${level.id}</div>
-                    <div style="font-size: 0.8rem">${level.title}</div>
+                    <div class="level-icon">${isUnlocked ? level.icon : '🔒'}</div>
+                    <div class="level-number">Fase ${level.id}</div>
+                    <div class="level-title">${level.title}</div>
                 `;
 
                 if (isUnlocked) {
@@ -468,35 +636,55 @@
             });
         }
 
-        // --- INICIAR NÍVEL ---
+        // --- INICIAR A FASE COM SORTEIO ---
         function startLevel(levelId) {
-            currentLevelObj = levelsData.find(l => l.id === levelId);
-            currentQuestionIndex = 0;
+            currentLevelId = levelId;
+            const levelData = levelsData.find(l => l.id === levelId);
             
-            // Reseta variáveis da sessão
+            // 1. Clona o banco de perguntas para não estragar o original
+            let questionsPool = JSON.parse(JSON.stringify(levelData.questions));
+            
+            // 2. Embaralha todas as perguntas disponíveis
+            shuffleArray(questionsPool);
+            
+            // 3. Pega apenas 5 perguntas para a partida
+            currentSessionQuestions = questionsPool.slice(0, questionsPerMatch);
+            
+            // 4. Embaralha as alternativas de cada pergunta
+            currentSessionQuestions.forEach(q => {
+                // Guarda o texto da resposta certa antes de embaralhar
+                let correctAnswerText = q.options[q.correct];
+                
+                // Embaralha as alternativas
+                shuffleArray(q.options);
+                
+                // Atualiza o índice da resposta certa após o embaralhamento
+                q.correct = q.options.indexOf(correctAnswerText);
+            });
+
+            currentQuestionIndex = 0;
             sessionScore = 0;
             sessionCorrectAnswers = 0;
             sessionTimeBonus = 0;
 
-            dom.ui.levelDisplay.innerText = `Nível ${levelId}`;
-            dom.ui.totalNum.innerText = currentLevelObj.questions.length;
+            dom.ui.levelDisplay.innerText = `Fase ${levelId}`;
+            dom.ui.totalNum.innerText = currentSessionQuestions.length;
 
-            dom.screens.start.style.display = 'none';
-            dom.screens.quiz.style.display = 'block';
-
+            switchScreen('quiz');
             loadQuestion();
         }
 
-        // --- CARREGAR PERGUNTA ---
+        // --- CARREGAR A PERGUNTA NA TELA ---
         function loadQuestion() {
             clearInterval(timerInterval);
             
             dom.qBody.options.innerHTML = '';
+            dom.qBody.pointsMsg.classList.remove('animate');
             dom.qBody.pointsMsg.style.opacity = '0';
             dom.qBody.nextBtn.style.display = 'none';
             dom.ui.currNum.innerText = currentQuestionIndex + 1;
 
-            const q = currentLevelObj.questions[currentQuestionIndex];
+            const q = currentSessionQuestions[currentQuestionIndex];
             dom.qBody.question.innerText = q.q;
 
             q.options.forEach((optText, index) => {
@@ -510,7 +698,7 @@
             startTimer();
         }
 
-        // --- SISTEMA DE TEMPO ---
+        // --- TEMPO ---
         function startTimer() {
             timeLeft = maxTime;
             updateTimerUI();
@@ -521,7 +709,7 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    handleAnswer(null, -1); // -1 significa tempo esgotado
+                    handleAnswer(null, -1);
                 }
             }, 1000);
         }
@@ -532,33 +720,34 @@
             dom.ui.timerBar.style.width = `${perc}%`;
 
             if (perc <= 30) {
-                dom.ui.timerBar.style.backgroundColor = 'var(--error-color)';
+                dom.ui.timerBar.style.background = 'var(--error-color)';
                 dom.ui.timeText.style.color = 'var(--error-color)';
             } else {
-                dom.ui.timerBar.style.backgroundColor = 'var(--timer-color)';
+                dom.ui.timerBar.style.background = 'linear-gradient(90deg, #4834d4, var(--timer-color))';
                 dom.ui.timeText.style.color = 'var(--timer-color)';
             }
         }
 
-        // --- LÓGICA DE RESPOSTA ---
+        // --- ESCOLHA DA RESPOSTA ---
         function selectOption(btn, index) {
-            clearInterval(timerInterval); // Para o relógio
+            clearInterval(timerInterval); 
             handleAnswer(btn, index);
         }
 
         function handleAnswer(selectedBtn, selectedIndex) {
-            const q = currentLevelObj.questions[currentQuestionIndex];
+            const q = currentSessionQuestions[currentQuestionIndex];
             const isCorrect = (selectedIndex === q.correct);
             const allBtns = dom.qBody.options.querySelectorAll('.option-btn');
             
-            // Trava os botões e mostra a correta
+            dom.qBody.pointsMsg.classList.remove('animate');
+            void dom.qBody.pointsMsg.offsetWidth;
+
             allBtns.forEach((btn, idx) => {
                 btn.disabled = true;
                 if (idx === q.correct) btn.classList.add('correct');
             });
 
             if (isCorrect) {
-                // Cálculo de Pontos: 100 base + 10 por segundo restante
                 const basePoints = 100;
                 const bonus = timeLeft * 10;
                 const totalGained = basePoints + bonus;
@@ -570,7 +759,7 @@
 
                 updateGlobalScore();
 
-                dom.qBody.pointsMsg.innerText = `+${totalGained} Pontos! (Bônus de tempo: ${bonus})`;
+                dom.qBody.pointsMsg.innerHTML = `Acertou! <br><span style="font-size:0.9rem">+${totalGained} (Bônus: ${bonus})</span>`;
                 dom.qBody.pointsMsg.style.color = 'var(--success-color)';
             } else {
                 if (selectedBtn) selectedBtn.classList.add('wrong');
@@ -578,59 +767,54 @@
                 dom.qBody.pointsMsg.style.color = 'var(--error-color)';
             }
 
-            dom.qBody.pointsMsg.style.opacity = '1';
+            dom.qBody.pointsMsg.classList.add('animate');
             dom.qBody.nextBtn.style.display = 'block';
         }
 
-        // --- AVANÇAR ---
         function nextQuestion() {
             currentQuestionIndex++;
-            if (currentQuestionIndex < currentLevelObj.questions.length) {
+            if (currentQuestionIndex < currentSessionQuestions.length) {
                 loadQuestion();
             } else {
                 finishLevel();
             }
         }
 
-        // --- FINALIZAR NÍVEL ---
+        // --- FINALIZAR FASE ---
         function finishLevel() {
-            dom.screens.quiz.style.display = 'none';
-            dom.screens.result.style.display = 'block';
+            switchScreen('result');
 
             document.getElementById('level-score-display').innerText = `+${sessionScore}`;
-            document.getElementById('correct-answers-display').innerText = `${sessionCorrectAnswers}/${currentLevelObj.questions.length}`;
+            document.getElementById('correct-answers-display').innerText = `${sessionCorrectAnswers}/${currentSessionQuestions.length}`;
             document.getElementById('time-bonus-display').innerText = sessionTimeBonus;
 
-            const perc = sessionCorrectAnswers / currentLevelObj.questions.length;
+            const perc = sessionCorrectAnswers / currentSessionQuestions.length;
             const feedback = document.getElementById('feedback-message');
             const title = document.getElementById('result-title');
 
-            // Regra para passar de nível: acertar mais da metade
-            if (perc > 0.5) {
+            if (perc >= 0.5) {
                 title.innerText = "Nível Concluído! 🎉";
+                title.style.color = 'var(--success-color)';
                 feedback.innerText = "Excelente trabalho! Você desbloqueou novos desafios.";
                 
-                // Desbloqueia próximo nível se existir
-                if (currentLevelObj.id === unlockedLevels && unlockedLevels < levelsData.length) {
+                if (currentLevelId === unlockedLevels && unlockedLevels < levelsData.length) {
                     unlockedLevels++;
                     updateGlobalScore();
                 }
             } else {
-                title.innerText = "Fim de Jogo";
-                feedback.innerText = "Você precisa de mais acertos para passar desta fase. Tente novamente!";
+                title.innerText = "Tente Novamente";
+                title.style.color = 'var(--error-color)';
+                feedback.innerText = "Você precisa de mais acertos para passar desta fase.";
             }
         }
 
-        // --- VOLTAR AO MENU ---
         function returnToMap() {
-            dom.screens.result.style.display = 'none';
             renderLevelMap();
-            dom.screens.start.style.display = 'block';
+            switchScreen('start');
         }
 
-        // --- RESETAR PROGRESSO (Para testes) ---
         function resetProgress() {
-            if(confirm("Tem certeza? Isso vai apagar todos os seus pontos e bloquear as fases novamente.")) {
+            if(confirm("Tem certeza? Todos os seus pontos e fases desbloqueadas serão perdidos.")) {
                 totalScore = 0;
                 unlockedLevels = 1;
                 updateGlobalScore();
@@ -638,7 +822,6 @@
             }
         }
 
-        // Inicia o app
         initApp();
     </script>
 </body>
